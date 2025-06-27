@@ -16,13 +16,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set build-time environment variables
-ARG NEXT_PUBLIC_API_URL
-ARG NEXT_PUBLIC_APP_NAME
-ARG NEXT_PUBLIC_VERSION
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_APP_NAME=$NEXT_PUBLIC_APP_NAME
-ENV NEXT_PUBLIC_VERSION=$NEXT_PUBLIC_VERSION
 
 # Next.js collects completely anonymous telemetry data about general usage.
 ENV NEXT_TELEMETRY_DISABLED 1
