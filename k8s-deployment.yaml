@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextjs-env-app
+  labels:
+    app: nextjs-env-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nextjs-env-app
+  template:
+    metadata:
+      labels:
+        app: nextjs-env-app
+    spec:
+      containers:
+      - name: nextjs-env-app
+        image: your-registry/nextjs-env-app:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          value: "https://api.example.com"
+        - name: NEXT_PUBLIC_APP_NAME
+          value: "My Next.js K8s App"
+        - name: NEXT_PUBLIC_VERSION
+          value: "1.0.0"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: database-url
+        - name: SERVER_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: server-secret
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextjs-env-service
+spec:
+  selector:
+    app: nextjs-env-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+type: Opaque
+stringData:
+  database-url: "postgresql://localhost:5432/mydb"
+  server-secret: "your-secret-key-here"
